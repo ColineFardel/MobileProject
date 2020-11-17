@@ -2,8 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { Header, Input, Button, ListItem, Icon, Card, Image } from 'react-native-elements';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SwipeScreen() {
 
@@ -23,10 +21,10 @@ export default function SwipeScreen() {
         .then((data) => {
           if (data.success != false) {
             setMovies([...movies, data]);
-            console.log('MOVIES ------ > ');
-            console.log(movies);
+            //console.log('MOVIES ------ > ');
+            //console.log(movies);
             setCurrentMovie(data);
-            console.log(data);
+            //console.log(data);
           }
         })
         .catch(error => {
@@ -42,11 +40,11 @@ export default function SwipeScreen() {
   }, [])
 
   const onLike = () => {
-    console.log('LIKE----');
+    //console.log('LIKE----');
     movies.splice(movies.length-1, 1);
     //console.log(movies);
     setCurrentMovie(movies[movies.length - 1]);
-    console.log(currentMovie);
+    //console.log(currentMovie);
   }
 
   const onUnLike = () => {

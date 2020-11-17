@@ -1,42 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import MatchesScreen from './components/MatchesScreen';
-import ProfileScreen from './components/ProfileScreen';
-import SwipeScreen from './components/SwipeScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import * as firebase from 'firebase';
+import { LoginStackNavigator } from './navigation/StackNavigation';
+import TabNavigation from './navigation/TabNavigation';
 
-export default function App() {
+export default function App(navigation) {
 
-  const Stack = createStackNavigator();
-  const Tab = createBottomTabNavigator();
+  /**
+   * Firebase configuration
+   */
+  var firebaseConfig = {
+    apiKey: "AIzaSyCJT-5r7xoWagyEWSlOzXGtl2o1nvvMpSc",
+    authDomain: "mobileproject-fa32e.firebaseapp.com",
+    databaseURL: "https://mobileproject-fa32e.firebaseio.com",
+    projectId: "mobileproject-fa32e",
+    storageBucket: "mobileproject-fa32e.appspot.com",
+    messagingSenderId: "936634225190",
+    appId: "1:936634225190:web:88d43ade5cc810f0e40ce7"
+  };
 
-  return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-            if (route.name === 'Movies') {
-              iconName = 'ios-film';
-            }
-            else if (route.name === 'Matches') {
-              iconName = 'md-heart';
-            }
-            else if (route.name === 'Profile') {
-              iconName = 'md-person';
-            }
-            return <Ionicons name={iconName} size={size} color={color}/>;
-          },
-        })}>
-        <Tab.Screen name="Movies" component={SwipeScreen} />
-        <Tab.Screen name="Matches" component={MatchesScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const [user, setUser] = useState('');
+
+
+  firebase.auth().onAuthStateChanged(user => {
+    if (user != null) {
+      setUser(user);
+      //console.log('We are authenticated now!');
+    }
+    else {
+      setUser(null);
+      //console.log('Jen ai plein le cul la ');
+    }
+  });
+
+  if (user != null) {
+    return (
+      < NavigationContainer >
+        <TabNavigation />
+      </NavigationContainer >
+    )
+  }
+  else {
+    return (
+      < NavigationContainer >
+        <LoginStackNavigator />
+      </NavigationContainer >
+    )
+  }
+
 }
 
 const styles = StyleSheet.create({
