@@ -2,53 +2,74 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ImageBackground } from 'react-native';
 import { Header, Input, Button, ListItem, Icon, Card, Image } from 'react-native-elements';
+import * as firebase from 'firebase';
 
 export default function SwipeScreen() {
 
   const url = 'https://api.themoviedb.org/3/movie/';
   const apiKey = '?api_key=da69f383468c28f2c73b8e53c978a20e';
   const imgUrl = 'https://image.tmdb.org/t/p/w500';
-  const [movies, setMovies] = useState([]);
 
-
+  const [likes, setLikes] = useState([]);
+  const [user, setUser] = useState('');
   const [currentMovie, setCurrentMovie] = useState('');
 
-  const getMovies = () => {
-    for (let i = 0; i < 3; i++) {
-      let randomNumber = Math.floor(Math.random() * 500) + 1;
-      fetch(url + randomNumber + apiKey)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.success != false) {
-            setMovies([...movies, data]);
-            //console.log('MOVIES ------ > ');
-            //console.log(movies);
-            setCurrentMovie(data);
-            //console.log(data);
-          }
-        })
-        .catch(error => {
-          Alert.alert('Error', error);
-        })
+  useEffect(() => {
+    getMovie();
+    getUserLikes();
+  }, [])
+
+  firebase.auth().onAuthStateChanged(user => {
+    setUser(user);
+  });
+
+  const getMovie = () =>{
+    let randomNumber = Math.floor(Math.random() * 10000) + 1;
+    fetch(url + randomNumber + apiKey)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success != false) {
+        setCurrentMovie(data);
+      }
+      else {
+        getMovie();
+      }
+    })
+    .catch(error => {
+      Alert.alert('Error', error);
+    })
+  }
+
+  const getUserLikes = () => {
+    firebase.database().ref(user.uid).on('value', snapshot => {
+      const data = snapshot.val();
+      if (data != null) {
+        setLikes(data.movies);
+        console.log(likes.length);
+      }
+    });
+  }
+
+  const onLike = () => {
+    //add movie to db
+    if(likes.length!=0){
+      setLikes([...likes, currentMovie]);
+      firebase.database().ref(user.uid + "/movies").set(likes).then(() => {
+        getMovie();
+      });
+    }
+    else{
+      setLikes([...likes, currentMovie]);
+      firebase.database().ref(user.uid + "/movies").push(likes).then(() => {
+        getMovie();
+      });
     }
     
   }
-
-  useEffect(() => {
-    getMovies();
-
-  }, [])
-
-  const onLike = () => {
-    //console.log('LIKE----');
-    movies.splice(movies.length-1, 1);
-    //console.log(movies);
-    setCurrentMovie(movies[movies.length - 1]);
-    //console.log(currentMovie);
-  }
-
+  //do something when no more movies in list
   const onUnLike = () => {
-
+    //testMoviesLength(changeCurrentMovie);
+    getMovie();
   }
 
   return (
@@ -61,7 +82,11 @@ export default function SwipeScreen() {
           <ImageBackground
             style={{ width: '100%', height: '100%', justifyContent: 'flex-end' }}
             source={{ uri: imgUrl + currentMovie.poster_path }}>
-            <Text style={{color:'red'}}>{currentMovie.title}</Text>
+            <View style={styles.desc}>
+              <Text style={{ color: 'white' }}>{currentMovie.title}</Text>
+              <Text style={{ color: 'white' }}>{currentMovie.release_date}</Text>
+              <Text style={{ color: 'white' }}>{currentMovie.overview}</Text>
+            </View>
           </ImageBackground>
         </Card>
       </View>
@@ -101,5 +126,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 40,
     width: '100%',
+  },
+  desc: {
+    backgroundColor: 'black',
+    opacity: 0.7,
   },
 });

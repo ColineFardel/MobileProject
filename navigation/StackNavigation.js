@@ -4,6 +4,7 @@ import Login from '../components/Login';
 import Signup from '../components/Signup';
 import App from '../App';
 import Profile from '../components/ProfileScreen';
+import Likes from '../components/LikeScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ const ProfileStackNavigator = () => {
         <Stack.Navigator>
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="App" component={App} />
+            <Stack.Screen name="Likes" component={Likes} />
         </Stack.Navigator>
     );
 }
