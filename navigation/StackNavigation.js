@@ -5,6 +5,8 @@ import Signup from '../components/Signup';
 import App from '../App';
 import Profile from '../components/ProfileScreen';
 import Likes from '../components/LikeScreen';
+import Friends from '../components/FriendsScreen';
+import AddFriend from '../components/AddFriend';
 
 const Stack = createStackNavigator();
 
@@ -13,7 +15,6 @@ const LoginStackNavigator = () => {
         <Stack.Navigator>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Signup" component={Signup} />
-            <Stack.Screen name="App" component={App} />
         </Stack.Navigator>
     );
 }
@@ -22,8 +23,9 @@ const ProfileStackNavigator = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="App" component={App} />
             <Stack.Screen name="Likes" component={Likes} />
+            <Stack.Screen name="Friends" component={Friends} />
+            <Stack.Screen name="AddFriend" component={AddFriend} />
         </Stack.Navigator>
     );
 }

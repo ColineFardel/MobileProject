@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import { Header, Input, Button, ListItem } from 'react-native-elements';
 import * as firebase from 'firebase';
@@ -8,6 +8,15 @@ export default function ProfileScreen({ navigation }) {
 
   const [user, setUser] = useState('');
   const [options, setOptions] = useState(['Likes', 'Friends', 'Settings']);
+  const [username, setUsername] = useState('');
+
+  firebase.auth().onAuthStateChanged(user => {
+    setUser(user);
+  });
+
+  useEffect(() => {
+    getUsername();
+  }, [])
 
   const logoff = () => {
     firebase.auth()
@@ -18,14 +27,28 @@ export default function ProfileScreen({ navigation }) {
       })
   }
 
-  firebase.auth().onAuthStateChanged(user => {
-    setUser(user);
-  });
+  const getUsername = () => {
+    console.log(user.uid);
+    firebase.database().ref(user.uid).on('value', snapshot => {
+      const data = snapshot.val();
+      if (data != null) {
+        console.log(data.username);
+        setUsername(data.username);
+        setOptions([data.username, ...options]);
+      }
+    });
+    
+  }
+
+  
 
   const goToScreen = (screen) => {
-    console.log(screen);
+    //console.log(screen);
     if (screen === 'Likes') {
       navigation.navigate('Likes',{user : {user}});
+    }
+    if (screen === 'Friends') {
+      navigation.navigate('Friends',{user : {user}});
     }
   }
 
@@ -38,23 +61,33 @@ export default function ProfileScreen({ navigation }) {
     </ListItem>
   )
 
-  return (
-    <View style={styles.container}>
-      <Text>Hello {user.email}</Text>
-      <StatusBar style="auto" />
-      <View style={styles.listContainer}>
-        <FlatList
-          data={options}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
+  if(username!=null){
+    return (
+      <View style={styles.container}>
+        <Text>Hello {username}</Text>
+        <StatusBar style="auto" />
+        <View style={styles.listContainer}>
+          <FlatList
+            data={options}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
+        <Button
+          onPress={() => logoff()}
+          title="LOG OFF"
         />
       </View>
-      <Button
-        onPress={() => logoff()}
-        title="LOG OFF"
-      />
-    </View>
-  );
+    );
+  }
+  else{
+    getUsername();
+    return(
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({

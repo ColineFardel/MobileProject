@@ -45,7 +45,8 @@ export default function SwipeScreen() {
       const data = snapshot.val();
       if (data != null) {
         setLikes(data.movies);
-        console.log(likes.length);
+        //console.log(data.movies);
+        //console.log(likes.length);
       }
     });
   }

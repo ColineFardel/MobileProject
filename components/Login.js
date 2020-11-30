@@ -15,7 +15,7 @@ export default function Login({ navigation }) {
             firebase.auth()
                 .signInWithEmailAndPassword(user.email, user.password)
                 .then((res) => {
-                    console.log(res);
+                    //console.log(res);
                     console.log('User logged in successfully!')
                     //navigation.navigate('App');
                 })
@@ -23,7 +23,7 @@ export default function Login({ navigation }) {
     }
 
     const signup = () => {
-        console.log('wesh jtj sa marche pas jme bute');
+        //console.log('wesh jtj sa marche pas jme bute');
         navigation.navigate('Signup');
     }
 
