@@ -53,15 +53,19 @@ export default function SwipeScreen() {
 
   const onLike = () => {
     //add movie to db
-    if(likes.length!=0){
-      setLikes([...likes, currentMovie]);
-      firebase.database().ref(user.uid + "/movies").set(likes).then(() => {
+    if(likes != null){
+      //console.log("likes est different de null");
+      
+      firebase.database().ref(user.uid + "/movies").set([...likes,currentMovie]).then(() => {
+        //console.log('the likes have been set');
+        setLikes([...likes, currentMovie]);
         getMovie();
       });
     }
     else{
-      setLikes([...likes, currentMovie]);
-      firebase.database().ref(user.uid + "/movies").push(likes).then(() => {
+      //console.log("likes est null");
+      firebase.database().ref(user.uid + "/movies").set([currentMovie]).then(() => {
+        setLikes([currentMovie]);
         getMovie();
       });
     }

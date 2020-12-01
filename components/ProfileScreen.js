@@ -7,7 +7,7 @@ import * as firebase from 'firebase';
 export default function ProfileScreen({ navigation }) {
 
   const [user, setUser] = useState('');
-  const [options, setOptions] = useState(['Likes', 'Friends', 'Settings']);
+  const [options, setOptions] = useState([]);
   const [username, setUsername] = useState('');
 
   firebase.auth().onAuthStateChanged(user => {
@@ -28,13 +28,13 @@ export default function ProfileScreen({ navigation }) {
   }
 
   const getUsername = () => {
-    console.log(user.uid);
+    //console.log(user.uid);
     firebase.database().ref(user.uid).on('value', snapshot => {
       const data = snapshot.val();
       if (data != null) {
-        console.log(data.username);
+        //console.log(data.username);
         setUsername(data.username);
-        setOptions([data.username, ...options]);
+        setOptions([data.username, 'Likes', 'Friends','Settings']);
       }
     });
     
@@ -64,7 +64,6 @@ export default function ProfileScreen({ navigation }) {
   if(username!=null){
     return (
       <View style={styles.container}>
-        <Text>Hello {username}</Text>
         <StatusBar style="auto" />
         <View style={styles.listContainer}>
           <FlatList
