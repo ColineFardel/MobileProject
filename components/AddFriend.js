@@ -77,6 +77,8 @@ export default function AddFriend({ route, navigation }) {
             });
         }
 
+        navigation.goBack();
+
     }
 
     renderItem = ({ item, index }) => (

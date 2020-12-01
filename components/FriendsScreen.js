@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { Header, Input, Button, ListItem } from 'react-native-elements';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { Header, Input, Button, ListItem, Text } from 'react-native-elements';
+import { StyleSheet, View, FlatList } from 'react-native';
 
 import * as firebase from 'firebase';
 
@@ -24,8 +24,8 @@ export default function FriendsScreen({ route, navigation }) {
   }, [])
 
   const deleteItem = (index) => {
-    likes.splice(index, 1);
-    firebase.database().ref(user.uid + "/friends").set(likes).then(() => {
+    friends.splice(index, 1);
+    firebase.database().ref(user.uid + "/friends").set(friends).then(() => {
       console.log('Friend deleted');
     });
   }
@@ -42,21 +42,34 @@ export default function FriendsScreen({ route, navigation }) {
     </ListItem>
   )
 
-  return (
-    <View style={styles.container}>
-      <Button
-          onPress={() => navigation.navigate('AddFriend',{user : {user}})}
+  if (friends != null) {
+    return (
+      <View style={styles.container}>
+        <Button
+          onPress={() => navigation.navigate('AddFriend', { user: { user } })}
           title="Add a new friend"
         />
-      <View style={styles.listContainer}>
-        <FlatList
-          data={friends}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
+        <View style={styles.listContainer}>
+          <FlatList
+            data={friends}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
+  else {
+    return (
+      <View style={styles.container}>
+        <Button
+          onPress={() => navigation.navigate('AddFriend', { user: { user } })}
+          title="Add a new friend"
+        />
+        <Text h3>You don't have any friends :(</Text>
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
