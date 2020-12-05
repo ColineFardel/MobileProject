@@ -8,7 +8,7 @@ export default function ProfileScreen({ navigation }) {
 
   const [user, setUser] = useState('');
   const [options, setOptions] = useState([]);
-  const [username, setUsername] = useState('');
+  //const [username, setUsername] = useState('');
 
   firebase.auth().onAuthStateChanged(user => {
     setUser(user);
@@ -23,6 +23,7 @@ export default function ProfileScreen({ navigation }) {
       .signOut()
       .then(() => {
         console.log('User signed out!');
+        //navigation.goBack();
         //navigation.navigate('App');
       })
   }
@@ -31,10 +32,12 @@ export default function ProfileScreen({ navigation }) {
     //console.log(user.uid);
     firebase.database().ref(user.uid).on('value', snapshot => {
       const data = snapshot.val();
-      if (data != null) {
-        //console.log(data.username);
-        setUsername(data.username);
+      if (data.username != null) {
+        console.log(data.username);
         setOptions([data.username, 'Likes', 'Friends','Settings']);
+        console.log(options);
+        //setUsername(data.username);
+        
       }
     });
     
@@ -61,7 +64,7 @@ export default function ProfileScreen({ navigation }) {
     </ListItem>
   )
 
-  if(username!=null){
+  if(options.length!=0){
     return (
       <View style={styles.container}>
         <StatusBar style="auto" />

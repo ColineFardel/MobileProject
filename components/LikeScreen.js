@@ -42,18 +42,29 @@ export default function LikeScreen({ route, navigation }) {
     </ListItem>
   )
 
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <View style={styles.listContainer}>
-        <FlatList
-          data={likes}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
+
+  if(likes!=null){
+    return (
+      <View style={styles.container}>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={likes}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
+  else{
+    return(
+      <View style={styles.container}>
+        <Text>You don't have any likes</Text>
+      </View>
+    );
+  }
+
+  
 }
 
 const styles = StyleSheet.create({

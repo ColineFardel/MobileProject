@@ -1,9 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MatchesScreen from '../components/MatchesScreen';
-import SwipeScreen from '../components/SwipeScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { ProfileStackNavigator } from './StackNavigation';
+import { ProfileStackNavigator, MovieStackNavigator } from './StackNavigation';
 
 export default function TabNavigation() {
     const Tab = createBottomTabNavigator();
@@ -25,7 +24,7 @@ export default function TabNavigation() {
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
             })}>
-            <Tab.Screen name="Movies" component={SwipeScreen} />
+            <Tab.Screen name="Movies" component={MovieStackNavigator} />
             <Tab.Screen name="Matches" component={MatchesScreen} />
             <Tab.Screen name="Profile" component={ProfileStackNavigator} />
         </Tab.Navigator>
