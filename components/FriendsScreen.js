@@ -23,11 +23,30 @@ export default function FriendsScreen({ route, navigation }) {
     getUserFriends();
   }, [])
 
-  const deleteItem = (index) => {
+  const deleteItem = (index, item) => {
     friends.splice(index, 1);
     firebase.database().ref(user.uid + "/friends").set(friends).then(() => {
       console.log('Friend deleted');
     });
+
+    firebase.database().ref(item.key).once('value', snapshot => {
+      const data = snapshot.val();
+      if (data.friends != null) {
+        let friendFriends = data.friends;
+        let newFriends = [];
+        for (var i = 0; i < friendFriends.length; i++) {
+          if (friendFriends[i].key != user.uid) {
+            newFriends = [...newFriends, friendFriends[i]];
+          }
+        }
+
+        firebase.database().ref(item.key + "/friends").set(newFriends).then(() => {
+          console.log('User deleted from friend friends');
+        });
+
+      }
+    });
+
   }
 
   renderItem = ({ item, index }) => (
@@ -36,7 +55,7 @@ export default function FriendsScreen({ route, navigation }) {
         <ListItem.Title>{item.username}</ListItem.Title>
       </ListItem.Content>
       <Button raised icon={{ name: 'delete', color: 'grey' }}
-        onPress={() => deleteItem(index)}
+        onPress={() => deleteItem(index, item)}
         type="clear"
       />
     </ListItem>

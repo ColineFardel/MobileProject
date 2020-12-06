@@ -23,7 +23,7 @@ export default function MatchesScreen() {
   const getMatches = (id) => {
     console.log('GETTING MATCHES');
     console.log(id);
-    firebase.database().ref(id).once('value', snapshot => {
+    firebase.database().ref(id).on('value', snapshot => {
       const data = snapshot.val();
       if (data.matches != null) {
         setMatches(data.matches);
