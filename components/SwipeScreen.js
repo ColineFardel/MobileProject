@@ -36,7 +36,7 @@ export default function SwipeScreen({ navigation }) {
    */
   const getMovie = () => {
     let randomNumber = Math.floor(Math.random() * 10000) + 1;
-    fetch(url + 5488 + apiKey)
+    fetch(url + 9294 + apiKey)
       .then((response) => response.json())
       .then((data) => {
         if (data.success != false) {

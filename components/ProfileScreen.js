@@ -1,21 +1,19 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
-import { Header, Input, Button, ListItem } from 'react-native-elements';
+import { StyleSheet, View, FlatList } from 'react-native';
+import { Button, ListItem } from 'react-native-elements';
 import * as firebase from 'firebase';
 
 export default function ProfileScreen({ navigation }) {
 
   const [user, setUser] = useState('');
   const [options, setOptions] = useState([]);
-  //const [username, setUsername] = useState('');
-
-  firebase.auth().onAuthStateChanged(user => {
-    setUser(user);
-  });
 
   useEffect(() => {
-    getUsername();
+    firebase.auth().onAuthStateChanged(user => {
+      setUser(user);
+      getUsername(user.uid);
+    });
   }, [])
 
   const logoff = () => {
@@ -23,35 +21,24 @@ export default function ProfileScreen({ navigation }) {
       .signOut()
       .then(() => {
         console.log('User signed out!');
-        //navigation.goBack();
-        //navigation.navigate('App');
       })
   }
 
-  const getUsername = () => {
-    //console.log(user.uid);
-    firebase.database().ref(user.uid).on('value', snapshot => {
+  const getUsername = (id) => {
+    firebase.database().ref(id).once('value', snapshot => {
       const data = snapshot.val();
       if (data.username != null) {
-        console.log(data.username);
-        setOptions([data.username, 'Likes', 'Friends','Settings']);
-        console.log(options);
-        //setUsername(data.username);
-        
+        setOptions([data.username, 'Likes', 'Friends', 'Settings']);
       }
     });
-    
   }
 
-  
-
   const goToScreen = (screen) => {
-    //console.log(screen);
     if (screen === 'Likes') {
-      navigation.navigate('Likes',{user : {user}});
+      navigation.navigate('Likes', { user: { user } });
     }
     if (screen === 'Friends') {
-      navigation.navigate('Friends',{user : {user}});
+      navigation.navigate('Friends', { user: { user } });
     }
   }
 
@@ -64,32 +51,22 @@ export default function ProfileScreen({ navigation }) {
     </ListItem>
   )
 
-  if(options.length!=0){
-    return (
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <View style={styles.listContainer}>
-          <FlatList
-            data={options}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        </View>
-        <Button
-          onPress={() => logoff()}
-          title="LOG OFF"
+  return (
+    <View style={styles.container}>
+      <StatusBar style="auto" />
+      <View style={styles.listContainer}>
+        <FlatList
+          data={options}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
         />
       </View>
-    );
-  }
-  else{
-    getUsername();
-    return(
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    )
-  }
+      <Button
+        onPress={() => logoff()}
+        title="LOG OFF"
+      />
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
