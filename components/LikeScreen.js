@@ -11,6 +11,13 @@ export default function LikeScreen({ route, navigation }) {
   const [matches, setMatches] = useState([]);
   const { user } = route.params.user;
 
+  useEffect(() => {
+    getUserData();
+  }, [])
+
+  /**
+   * Method to get the user data
+   */
   const getUserData = () => {
     firebase.database().ref(user.uid).on('value', snapshot => {
       const data = snapshot.val();
@@ -23,10 +30,11 @@ export default function LikeScreen({ route, navigation }) {
     });
   }
 
-  useEffect(() => {
-    getUserData();
-  }, [])
-
+  /**
+   * Method to delete the movie for the user in the database
+   * @param {Movie the user want to delete} item 
+   * @param {Index of the movie in the array} index 
+   */
   const deleteItem = (item, index) => {
     likes.splice(index, 1);
 
@@ -37,11 +45,13 @@ export default function LikeScreen({ route, navigation }) {
     checkMatches(item);
   }
 
+  /**
+   * Method to delete matches which include the like deleted
+   * @param {Movie deleted} item 
+   */
   const checkMatches = (item) => {
     let newMatches = [];
     for (var i = 0; i < matches.length; i++) {
-      //console.log(matches[i].movie.title);
-      //console.log(item.title);
       if (matches[i].movie.title != item.title) {
         newMatches = [...newMatches, matches[i]];
       }
@@ -49,15 +59,17 @@ export default function LikeScreen({ route, navigation }) {
         removeMatchFromFriend(matches[i].friend.key, item);
       }
     }
-
-    console.log('Matches for user' + newMatches);
-
     firebase.database().ref(user.uid + "/matches").set(newMatches).then(() => {
       console.log('Matches updated');
     });
 
   }
 
+  /**
+   * Method to delete matches with friends which include the movie deleted
+   * @param {Friend id} id 
+   * @param {Movie deleted} item 
+   */
   const removeMatchFromFriend = (id, item) => {
     firebase.database().ref(id).on('value', snapshot => {
       const data = snapshot.val();
@@ -73,14 +85,9 @@ export default function LikeScreen({ route, navigation }) {
             }
           }
         }
-
-        console.log('Matches for friend' + newMatches);
-
         firebase.database().ref(id + "/matches").set(newMatches).then(() => {
           console.log('Matches for friend updated');
         });
-
-        //setMatches(data.matches);
       }
     });
   }

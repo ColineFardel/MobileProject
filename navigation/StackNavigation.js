@@ -8,6 +8,7 @@ import Friends from '../components/FriendsScreen';
 import AddFriend from '../components/AddFriend';
 import SwipeScreen from '../components/SwipeScreen';
 import MovieDetails from '../components/MovieDetails';
+import MatchesScreen from '../components/MatchesScreen';
 
 const Stack = createStackNavigator();
 
@@ -37,7 +38,16 @@ const MovieStackNavigator = () => {
             <Stack.Screen name="SwipeScreen" component={SwipeScreen} />
             <Stack.Screen name="MovieDetails" component={MovieDetails} />
         </Stack.Navigator>
-    ); 
+    );
 }
 
-export { LoginStackNavigator, ProfileStackNavigator, MovieStackNavigator };
+const MatchesStackNavigation = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen name="MatchesScreen" component={MatchesScreen} />
+            <Stack.Screen name="MovieDetails" component={MovieDetails} />
+        </Stack.Navigator>
+    );
+}
+
+export { LoginStackNavigator, ProfileStackNavigator, MovieStackNavigator, MatchesStackNavigation };

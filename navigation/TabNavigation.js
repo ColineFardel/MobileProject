@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MatchesScreen from '../components/MatchesScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { ProfileStackNavigator, MovieStackNavigator } from './StackNavigation';
+import { ProfileStackNavigator, MovieStackNavigator, MatchesStackNavigation } from './StackNavigation';
 
 export default function TabNavigation() {
     const Tab = createBottomTabNavigator();
@@ -25,7 +25,7 @@ export default function TabNavigation() {
                 },
             })}>
             <Tab.Screen name="Movies" component={MovieStackNavigator} />
-            <Tab.Screen name="Matches" component={MatchesScreen} />
+            <Tab.Screen name="Matches" component={MatchesStackNavigation} />
             <Tab.Screen name="Profile" component={ProfileStackNavigator} />
         </Tab.Navigator>
     )

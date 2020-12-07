@@ -5,7 +5,7 @@ import { StyleSheet, View, FlatList } from 'react-native';
 
 import * as firebase from 'firebase';
 
-export default function MatchesScreen() {
+export default function MatchesScreen({navigation}) {
 
   const [user, setUser] = useState('');
   const [matches, setMatches] = useState([]);
@@ -32,8 +32,13 @@ export default function MatchesScreen() {
     });
   }
 
+  const showDetails = (currentMovie) => {
+    navigation.navigate('MovieDetails', { movie: { currentMovie } })
+  }
+
   renderItem = ({ item, index }) => (
-    <ListItem bottomDivider>
+    <ListItem bottomDivider
+      onPress={() => showDetails(item.movie)}>
       <ListItem.Content>
         <ListItem.Title>{item.movie.title}</ListItem.Title>
       </ListItem.Content>

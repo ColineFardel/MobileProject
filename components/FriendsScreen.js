@@ -1,6 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { Header, Input, Button, ListItem, Text } from 'react-native-elements';
+import { Button, ListItem, Text } from 'react-native-elements';
 import { StyleSheet, View, FlatList } from 'react-native';
 
 import * as firebase from 'firebase';
@@ -8,27 +7,58 @@ import * as firebase from 'firebase';
 export default function FriendsScreen({ route, navigation }) {
 
   const [friends, setFriends] = useState([]);
+  const [matches, setMatches] = useState([]);
   const { user } = route.params.user;
 
-  const getUserFriends = () => {
+  useEffect(() => {
+    getUserData();
+  }, [])
+
+  const getUserData = () => {
     firebase.database().ref(user.uid).on('value', snapshot => {
       const data = snapshot.val();
-      if (data != null) {
+      if (data.friends != null) {
         setFriends(data.friends);
+      }
+      if (data.matches != null) {
+        setMatches(data.matches);
       }
     });
   }
 
-  useEffect(() => {
-    getUserFriends();
-  }, [])
-
-  const deleteItem = (index, item) => {
-    friends.splice(index, 1);
-    firebase.database().ref(user.uid + "/friends").set(friends).then(() => {
-      console.log('Friend deleted');
+  const deleteUserMatches = (item) => {
+    let newMatches = [];
+    for (var i = 0; i < matches.length; i++) {
+      if (matches[i].friend.key != item.key) {
+        newMatches = [...newMatches, matches[i]];
+      }
+      else {
+        deleteFriendMatches(matches[i].friend.key, item);
+      }
+    }
+    firebase.database().ref(user.uid + "/matches").set(newMatches).then(() => {
+      console.log('Matches updated');
     });
+  }
 
+  const deleteFriendMatches = (id) => {
+    firebase.database().ref(id).once('value', snapshot => {
+      const data = snapshot.val();
+      if (data.matches != null) {
+        var newMatches = [];
+        for (var i = 0; i < data.matches.length; i++) {
+          if (data.matches[i].friend.key != user.uid) {
+            newMatches = [...newMatches, data.matches[i]];
+          }
+        }
+        firebase.database().ref(id + "/matches").set(newMatches).then(() => {
+          console.log('Matches for friend updated');
+        });
+      }
+    });
+  }
+
+  const deleteUserForFriend = (item) => {
     firebase.database().ref(item.key).once('value', snapshot => {
       const data = snapshot.val();
       if (data.friends != null) {
@@ -39,14 +69,26 @@ export default function FriendsScreen({ route, navigation }) {
             newFriends = [...newFriends, friendFriends[i]];
           }
         }
-
         firebase.database().ref(item.key + "/friends").set(newFriends).then(() => {
           console.log('User deleted from friend friends');
         });
-
       }
     });
+  }
 
+  const deleteFriend = (index) => {
+    friends.splice(index, 1);
+    firebase.database().ref(user.uid + "/friends").set(friends).then(() => {
+      console.log('Friend deleted');
+    });
+  }
+
+  const deleteItem = (index, item) => {
+    deleteFriend(index);
+
+    deleteUserForFriend(item);
+
+    deleteUserMatches(item);
   }
 
   renderItem = ({ item, index }) => (
