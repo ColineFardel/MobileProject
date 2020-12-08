@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { Header, Input, Button, ListItem } from 'react-native-elements';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
@@ -41,7 +40,6 @@ export default function LikeScreen({ route, navigation }) {
     firebase.database().ref(user.uid + "/movies").set(likes).then(() => {
       console.log('Like deleted');
     });
-
     checkMatches(item);
   }
 
@@ -71,7 +69,7 @@ export default function LikeScreen({ route, navigation }) {
    * @param {Movie deleted} item 
    */
   const removeMatchFromFriend = (id, item) => {
-    firebase.database().ref(id).on('value', snapshot => {
+    firebase.database().ref(id).once('value', snapshot => {
       const data = snapshot.val();
       if (data.matches != null) {
         var newMatches = [];
@@ -92,8 +90,17 @@ export default function LikeScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Navigate to show the movie details
+   * @param {Movie the user want to see} currentMovie 
+   */
+  const showDetails = (currentMovie) => {
+    navigation.navigate('MovieDetails', { movie: { currentMovie } })
+  }
+
   renderItem = ({ item, index }) => (
-    <ListItem bottomDivider>
+    <ListItem bottomDivider
+      onPress={() => showDetails(item)}>
       <ListItem.Content>
         <ListItem.Title>{item.title}</ListItem.Title>
       </ListItem.Content>
@@ -105,7 +112,7 @@ export default function LikeScreen({ route, navigation }) {
   )
 
 
-  if (likes != null) {
+  if (likes.length != 0) {
     return (
       <View style={styles.container}>
         <View style={styles.listContainer}>

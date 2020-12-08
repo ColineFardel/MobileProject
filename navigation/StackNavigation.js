@@ -26,6 +26,7 @@ const ProfileStackNavigator = () => {
         <Stack.Navigator>
             <Stack.Screen name="Profile" component={Profile} />
             <Stack.Screen name="Likes" component={Likes} />
+            <Stack.Screen name="MovieDetails" component={MovieDetails} />
             <Stack.Screen name="Friends" component={Friends} />
             <Stack.Screen name="AddFriend" component={AddFriend} />
         </Stack.Navigator>

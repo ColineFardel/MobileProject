@@ -14,6 +14,9 @@ export default function FriendsScreen({ route, navigation }) {
     getUserData();
   }, [])
 
+  /**
+   * Get the user data from database
+   */
   const getUserData = () => {
     firebase.database().ref(user.uid).on('value', snapshot => {
       const data = snapshot.val();
@@ -26,6 +29,10 @@ export default function FriendsScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Delete the matches with deleted friend
+   * @param {Friend deleted} item 
+   */
   const deleteUserMatches = (item) => {
     let newMatches = [];
     for (var i = 0; i < matches.length; i++) {
@@ -41,6 +48,10 @@ export default function FriendsScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Delete matches with user
+   * @param {Deleted friend id} id 
+   */
   const deleteFriendMatches = (id) => {
     firebase.database().ref(id).once('value', snapshot => {
       const data = snapshot.val();
@@ -58,6 +69,10 @@ export default function FriendsScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Delete the user in the friend's list of the friend deleted
+   * @param {Deleted friend} item 
+   */
   const deleteUserForFriend = (item) => {
     firebase.database().ref(item.key).once('value', snapshot => {
       const data = snapshot.val();
@@ -76,6 +91,10 @@ export default function FriendsScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Delete friend in user's friend list
+   * @param {Deleted friend} index 
+   */
   const deleteFriend = (index) => {
     friends.splice(index, 1);
     firebase.database().ref(user.uid + "/friends").set(friends).then(() => {
@@ -83,6 +102,11 @@ export default function FriendsScreen({ route, navigation }) {
     });
   }
 
+  /**
+   * Delete the friend and the matches in common
+   * @param {Index of friend in array} index 
+   * @param {Friend to delete} item 
+   */
   const deleteItem = (index, item) => {
     deleteFriend(index);
 
@@ -103,7 +127,7 @@ export default function FriendsScreen({ route, navigation }) {
     </ListItem>
   )
 
-  if (friends != null) {
+  if (friends.length != 0) {
     return (
       <View style={styles.container}>
         <Button

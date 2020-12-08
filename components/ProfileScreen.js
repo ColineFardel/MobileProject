@@ -16,6 +16,9 @@ export default function ProfileScreen({ navigation }) {
     });
   }, [])
 
+  /**
+   * Log off the user
+   */
   const logoff = () => {
     firebase.auth()
       .signOut()
@@ -24,6 +27,10 @@ export default function ProfileScreen({ navigation }) {
       })
   }
 
+  /**
+   * Get the username
+   * @param {Id of the current user} id 
+   */
   const getUsername = (id) => {
     firebase.database().ref(id).once('value', snapshot => {
       const data = snapshot.val();
@@ -33,6 +40,10 @@ export default function ProfileScreen({ navigation }) {
     });
   }
 
+  /**
+   * Navigate to the screen the user selected
+   * @param {Screen the user want to see} screen 
+   */
   const goToScreen = (screen) => {
     if (screen === 'Likes') {
       navigation.navigate('Likes', { user: { user } });
@@ -62,6 +73,7 @@ export default function ProfileScreen({ navigation }) {
         />
       </View>
       <Button
+        buttonStyle={{ backgroundColor: 'red' , marginBottom:15}}
         onPress={() => logoff()}
         title="LOG OFF"
       />

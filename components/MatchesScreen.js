@@ -1,15 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { Header, Input, Button, ListItem, Text } from 'react-native-elements';
+import { ListItem, Text } from 'react-native-elements';
 import { StyleSheet, View, FlatList } from 'react-native';
-
 import * as firebase from 'firebase';
 
-export default function MatchesScreen({navigation}) {
+export default function MatchesScreen({ navigation }) {
 
   const [user, setUser] = useState('');
   const [matches, setMatches] = useState([]);
 
+  /**
+   * Get the logged user
+   */
   firebase.auth().onAuthStateChanged(user => {
     setUser(user);
   });
@@ -20,18 +21,26 @@ export default function MatchesScreen({navigation}) {
     });
   }, [])
 
+  /**
+   * Get matches of the user from database
+   * @param {Id of the current user} id 
+   */
   const getMatches = (id) => {
-    console.log('GETTING MATCHES');
-    console.log(id);
     firebase.database().ref(id).on('value', snapshot => {
       const data = snapshot.val();
       if (data.matches != null) {
         setMatches(data.matches);
-        console.log('THE MATCHES ARE SET');
+      }
+      else {
+        setMatches([]);
       }
     });
   }
 
+  /**
+   * Navigate to show the movie details
+   * @param {Movie the user want to see} currentMovie 
+   */
   const showDetails = (currentMovie) => {
     navigation.navigate('MovieDetails', { movie: { currentMovie } })
   }

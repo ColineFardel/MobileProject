@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
-import { Header, Input, Button, ListItem, Icon, Card, Image } from 'react-native-elements';
+import { StyleSheet, View, Alert } from 'react-native';
+import { Input, Button } from 'react-native-elements';
 import * as firebase from 'firebase';
 
 export default function Signup({ navigation }) {
@@ -8,44 +8,30 @@ export default function Signup({ navigation }) {
     const [user, setUser] = useState('');
     const [username, setUsername] = useState('');
     const [users, setUsers] = useState([]);
-    const [check, setCheck] = useState(false);
 
     useEffect(() => {
-        getData();
+        getAllUsers();
     }, [])
 
-    const getData = () => {
+    /**
+     * Get all users from database
+     */
+    const getAllUsers = () => {
         firebase.database().ref().on('value', snapshot => {
             const data = snapshot.val();
             if (data != null) {
                 setUsers(Object.values(data));
-                //console.log('data is not null');
             }
         });
     }
 
-    const checkUsernameExists = () => {
-        if (users != null) {
-            users.map((value) => {
-                console.log(value.username + ' compared to ' + username);
-                if (username === value.username) {
-                    console.log('now check is true');
-                    setCheck(true);
-                }
-                else {
-                    console.log('not doing anything');
-                    //setCheck(false);
-                }
-            })
-        }
-        else {
-            getData();
-        }
-    }
-
+    /**
+     * Compare username with existing users
+     * Sign up the new user into firebase authentification
+     * Add the username of the new user in the database with its id
+     */
     const signup = () => {
         if (users != null) {
-
             var check = () => {
                 for (var i = 0; i < users.length; i++) {
                     if (users[i].username === username) {
@@ -55,7 +41,6 @@ export default function Signup({ navigation }) {
                 }
                 return false;
             }
-
             if (check() === false) {
                 firebase.auth()
                     .createUserWithEmailAndPassword(user.email, user.password)
@@ -63,17 +48,18 @@ export default function Signup({ navigation }) {
                         if (firebase.auth().currentUser) {
                             var userId = firebase.auth().currentUser.uid;
                             if (userId) {
-                                firebase.database().ref(userId).set({username: username});
+                                firebase.database().ref(userId).set({ username: username });
                             }
                         }
                         console.log('User account created & signed in!');
                     })
                     .catch(error => {
                         if (error.code === 'auth/email-already-in-use') {
-                            console.log('That email address is already in use!');
+                            Alert.alert('Email already used', 'Please use another email address or log in');
                         }
 
                         if (error.code === 'auth/invalid-email') {
+                            Alert.alert('Email invalid', 'That email address is invalid please use a valid one');
                             console.log('That email address is invalid!');
                         }
 
@@ -82,7 +68,7 @@ export default function Signup({ navigation }) {
             }
         }
         else {
-            getData();
+            getAllUsers();
         }
     }
 
@@ -95,7 +81,7 @@ export default function Signup({ navigation }) {
             />
             <Input
                 placeholder="Username"
-                onChangeText={text => { setUsername(text), setCheck(false) }}
+                onChangeText={text => { setUsername(text) }}
                 value={username}
             />
             <Input
@@ -105,9 +91,11 @@ export default function Signup({ navigation }) {
                 secureTextEntry={true}
             />
             <Button
+                buttonStyle={{ backgroundColor: 'green', marginBottom: 35, width: 150 }}
                 onPress={() => signup()}
                 title="SIGN UP" />
             <Button
+                type='clear'
                 onPress={() => navigation.navigate('Login')}
                 title="LOG IN" />
         </View>
