@@ -10,6 +10,8 @@ export default function AddFriend({ route, navigation }) {
     const [username, setUsername] = useState('');
     const [name, setName] = useState('');
     const [users, setUsers] = useState([]);
+    const [likes, setLikes] = useState([]);
+    const [matches, setMatches] = useState([]);
     const { user } = route.params.user;
 
     useEffect(() => {
@@ -27,6 +29,12 @@ export default function AddFriend({ route, navigation }) {
             }
             if (data.username != null) {
                 setUsername(data.username);
+            }
+            if (data.matches != null) {
+                setMatches(data.matches);
+            }
+            if (data.movies != null) {
+                setLikes(data.movies);
             }
         });
     }
@@ -92,13 +100,44 @@ export default function AddFriend({ route, navigation }) {
         navigation.goBack();
     }
 
+    const checkMatches = (item) => {
+        var friendLikes = [];
+        var friendMatches = [];
+        var newMatches = [];
+        firebase.database().ref(item.key).once('value', snapshot => {
+            const data = snapshot.val();
+            if (data.movies != null) {
+                friendLikes = data.movies;
+            }
+            if (data.matches != null) {
+                friendMatches = data.matches;
+            }
+            for (var i = 0; i < friendLikes.length; i++) {
+                for (var y = 0; y < likes.length; y++) {
+                    if (friendLikes[i].title === likes[y].title) {
+                        var match = { movie: likes[y], friend: { key: item.key, username: item.username } };
+                        var friendmatch = { movie: likes[y], friend: { key: user.uid, username: username } };
+                        friendMatches = [...friendMatches, friendmatch];
+                        newMatches = [...matches, match];
+                    }
+                }
+            }
+            firebase.database().ref(item.key + "/matches").set(friendMatches).then(() => {
+                console.log('Matches updated for friend');
+            });
+            firebase.database().ref(user.uid + "/matches").set(newMatches).then(() => {
+                console.log('Matches updated for user');
+            });
+        });
+    }
+
     renderItem = ({ item, index }) => (
         <ListItem bottomDivider>
             <ListItem.Content>
                 <ListItem.Title>{item.username}</ListItem.Title>
             </ListItem.Content>
             <Button raised icon={{ name: 'add', color: 'green' }}
-                onPress={() => { addFriend(item), addUserToFriend(item) }}
+                onPress={() => { addFriend(item), addUserToFriend(item), checkMatches(item) }}
                 type="clear"
             />
         </ListItem>

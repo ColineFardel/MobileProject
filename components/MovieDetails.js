@@ -24,7 +24,7 @@ export default function MovieDetails({ route, navigation }) {
                 <Text h3>Release Date</Text>
                 <Text style={styles.infoText}>{movie.currentMovie.release_date}</Text>
                 <Text h3>Average note</Text>
-                <Text style={styles.infoText}>{movie.currentMovie.vote_average}</Text>
+                <Text style={styles.infoText}>{movie.currentMovie.vote_average}/10</Text>
                 <Text h3>Duration</Text>
                 <Text style={styles.infoText}>{movie.currentMovie.runtime} minutes</Text>
                 <Text h3>Genres</Text>

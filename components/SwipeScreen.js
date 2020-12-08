@@ -59,7 +59,7 @@ export default function SwipeScreen({ navigation }) {
    * Get the movie to show to the user
    */
   const getMovie = () => {
-    let randomNumber = Math.floor(Math.random() * 10000) + 1;
+    let randomNumber = Math.floor(Math.random() * 100) + 1;
     fetch(url + randomNumber + apiKey)
       .then((response) => response.json())
       .then((data) => {
