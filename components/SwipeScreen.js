@@ -2,6 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Alert } from 'react-native';
 import { Icon, Card } from 'react-native-elements';
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
 import * as firebase from 'firebase';
 
 export default function SwipeScreen({ navigation }) {
@@ -26,9 +28,53 @@ export default function SwipeScreen({ navigation }) {
   useEffect(() => {
     firebase.auth().onAuthStateChanged(user => {
       getUserData(user.uid);
+      registerForPushNotificationsAsync();
     });
     getMovie();
   }, [])
+
+  /**
+   * Send a notification if match with a friend
+   * @param {Token of the friend} token 
+   */
+  const sendPushNotification = (token)=>{
+    const message = {
+      to: token,
+      sound: 'default',
+      title: 'Match',
+      body: 'You just got a new match !',
+    };
+
+    let response = fetch('https://exp.host/--/api/v2/push/send',{
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(message),
+    })
+  }
+
+  /**
+   * Register the user to send them notifications
+   */
+  registerForPushNotificationsAsync = async () => {
+    let token;
+
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    firebase.database().ref(user.uid + '/push_token').set(token);
+
+  }
 
   /**
    * Get user data
@@ -121,6 +167,9 @@ export default function SwipeScreen({ navigation }) {
 
                   if (data.matches != null) {
                     saveFriendMatches([...data.matches, friendMatch], friend.key);
+                    if(data.push_token != null){
+                      sendPushNotification(data.push_token);
+                    }
                   }
                   else {
                     saveFriendMatches([friendMatch], friend.key);
@@ -201,59 +250,6 @@ export default function SwipeScreen({ navigation }) {
       <StatusBar style="auto" />
     </View>
   )
-
-  if (likes != null) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.cards}>
-
-          <TouchableOpacity onPress={() => showDetails()}>
-            <Card pointerEvents="none" style={{ height: '100%', backgroundColor: 'red' }}
-              containerStyle={{ height: '95%', padding: -10 }}
-            >
-              <ImageBackground
-                style={{ width: '100%', height: '100%', justifyContent: 'flex-end' }}
-                source={{ uri: imgUrl + currentMovie.poster_path }}>
-                <View style={styles.desc}>
-                  <Text style={{ color: 'white', fontSize: 30 }}>{currentMovie.title}</Text>
-                  <Text style={{ color: 'white' }}>{currentMovie.release_date}</Text>
-                  <Text style={{ color: 'white' }}>{currentMovie.overview}</Text>
-                </View>
-              </ImageBackground>
-            </Card>
-          </TouchableOpacity>
-
-        </View>
-        <View style={styles.buttonContainer}>
-          <Icon
-            reverse
-            name='md-close'
-            type='ionicon'
-            color='red'
-            onPress={() => onUnLike()}
-          />
-          <Icon
-            reverse
-            name='md-heart'
-            type='ionicon'
-            color='green'
-            onPress={() => onLike()}
-          />
-        </View>
-        <StatusBar style="auto" />
-      </View>
-    );
-  }
-  else {
-    getUserLikes();
-    return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-
 }
 
 const styles = StyleSheet.create({

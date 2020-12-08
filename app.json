@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "MovieMatch",
-    "slug": "MovieMatch",
+    "name": "MoMa",
+    "slug": "MoMa",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./clapperboard.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./clapperboard.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -21,7 +21,7 @@
     },
     "android": {
       "package": "com.coline.MovieTinder",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
